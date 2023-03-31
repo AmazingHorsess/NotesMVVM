@@ -20,57 +20,61 @@ import androidx.navigation.compose.rememberNavController
 import com.example.notesmvvm.navigation.NavRoute
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.notesmvvm.MainViewModel
+import com.example.notesmvvm.model.NoteModel
 
 import com.example.notesmvvm.ui.theme.NotesMVVMTheme
+import com.example.notesmvvm.utils.Constants
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun Add(navController: NavHostController){
+fun AddScreen(navController: NavHostController, viewModel: MainViewModel) {
     var title by remember { mutableStateOf("")}
     var subtitle by remember { mutableStateOf("")}
+    var isButtonEnabled by remember { mutableStateOf(false)}
     Scaffold {
-
-
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Add new note",
+                text = Constants.Keys.ADD_NEW_NOTE,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             OutlinedTextField(
                 value = title,
-                onValueChange =  { title = it },
-                label = { Text(text = "Note title") }
+                onValueChange =  {
+                    title = it
+                    isButtonEnabled = title.isNotEmpty() && subtitle.isNotEmpty()
+                },
+                label = { Text(text = Constants.Keys.NOTE_TITLE) },
+                isError = title.isEmpty()
             )
             OutlinedTextField(
                 value = subtitle,
-                onValueChange =  { subtitle = it },
-                label = { Text(text = "Note subtitle") }
+                onValueChange =  {
+                    subtitle = it
+                    isButtonEnabled = title.isNotEmpty() && subtitle.isNotEmpty()
+                },
+                label = { Text(text = Constants.Keys.NOTE_SUBTITLE) },
+                isError = subtitle.isEmpty()
             )
             Button(
                 modifier = Modifier.padding(top = 16.dp),
+                enabled = isButtonEnabled,
                 onClick = {
-                    navController.navigate(NavRoute.Main.route)
+                    viewModel.addNote(note =  NoteModel(title = title, subtitle = subtitle)) {
+                        navController.navigate(NavRoute.Main.route)
+                    }
                 }
             ) {
-                Text(text = "Add note")
+                Text(text = Constants.Keys.ADD_NOTE)
             }
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun prevAddScreen() {
-    NotesMVVMTheme {
-        Add(navController = rememberNavController())
-    }
-}
-
 

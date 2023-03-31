@@ -19,40 +19,52 @@ import com.example.notesmvvm.MainViewModel
 import com.example.notesmvvm.MainViewModelFactory
 import com.example.notesmvvm.navigation.NavRoute
 import com.example.notesmvvm.ui.theme.NotesMVVMTheme
+import com.example.notesmvvm.utils.Constants.Keys.FIREBASE_DATABASE
+import com.example.notesmvvm.utils.Constants.Keys.ROOM_DATABASE
+import com.example.notesmvvm.utils.Constants.Keys.WHAT_WILL_WE_USE
 import com.example.notesmvvm.utils.TYPE_FIREBASE
 import com.example.notesmvvm.utils.TYPE_ROOM
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun StartScreen(navController: NavHostController){
+fun StartScreen(navController: NavHostController, viewModel: MainViewModel) {
     val context = LocalContext.current
-    val mViewModel: MainViewModel = viewModel(factory = MainViewModelFactory(context.applicationContext as Application))
-    Scaffold(modifier = Modifier.fillMaxSize()) {
+    val mViewModel: MainViewModel =
+        viewModel(factory = MainViewModelFactory(context.applicationContext as Application))
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Что следует использовать?")
+            Text(text = WHAT_WILL_WE_USE)
             Button(
                 onClick = {
-                    mViewModel.initDatabase(TYPE_ROOM){
-                    navController.navigate(route = NavRoute.Main.route) }},
-            modifier = Modifier
-                .width(200.dp)
-                .padding(vertical = 8.dp)) {
-                Text(text = "Room database")
-            }
-            Button(
-                onClick = {
-                    mViewModel.initDatabase(TYPE_FIREBASE){
-                    navController.navigate(route = NavRoute.Main.route)}
+                    mViewModel.initDatabase(TYPE_ROOM) {
+                        navController.navigate(route = NavRoute.Main.route)
+                    }
+
                 },
                 modifier = Modifier
                     .width(200.dp)
                     .padding(vertical = 8.dp)
             ) {
-                Text(text = "Firebase database")
+                Text(text = ROOM_DATABASE)
+            }
+            Button(
+                onClick = {
+                    mViewModel.initDatabase(TYPE_FIREBASE) {
+                        navController.navigate(route = NavRoute.Main.route)
+                    }
+
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(text = FIREBASE_DATABASE)
             }
         }
     }
@@ -62,6 +74,9 @@ fun StartScreen(navController: NavHostController){
 @Composable
 fun prevStartScreen() {
     NotesMVVMTheme {
-        StartScreen(navController = rememberNavController())
+        val context = LocalContext.current
+        val mViewModel: MainViewModel =
+            viewModel(factory = MainViewModelFactory(context.applicationContext as Application))
+        StartScreen(navController = rememberNavController(), viewModel = mViewModel)
     }
 }

@@ -2,16 +2,15 @@ package com.example.notesmvvm
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.example.notesmvvm.database.room.dao.repository.AppRoomDatabase
 import com.example.notesmvvm.database.room.dao.repository.RoomRepository
 import com.example.notesmvvm.model.NoteModel
 import com.example.notesmvvm.utils.REPOSITORY
 import com.example.notesmvvm.utils.TYPE_FIREBASE
 import com.example.notesmvvm.utils.TYPE_ROOM
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,6 +24,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 REPOSITORY = RoomRepository(dao)
                 onSucess()
 
+            }
+        }
+    }
+    fun addNote(note: NoteModel, onSuccess: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            REPOSITORY.create(note = note) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    onSuccess()
+                }
+            }
+        }
+    }
+    fun readAllNotes() = REPOSITORY.readAll
+
+
+    fun updateNote(note: NoteModel, onSuccess: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            REPOSITORY.update(note = note) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    onSuccess()
+                }
+            }
+        }
+    }
+
+    fun deleteNote(note: NoteModel, onSuccess: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            REPOSITORY.delete(note = note) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    onSuccess()
+                }
             }
         }
     }
